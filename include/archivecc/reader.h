@@ -26,10 +26,15 @@
 #ifndef ARCHIVECC_READER_H
 #define ARCHIVECC_READER_H
 
+#include <memory>
+
 namespace archivecc {
 
 class Reader {
 public:
+	using ptr = std::shared_ptr<Reader>;
+
+	static ptr create();
 	virtual ~Reader();
 };
 
