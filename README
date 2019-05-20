@@ -1,0 +1,15 @@
+libarchivecc C++ libarchive wrapper [https://github.com/afett/libarchivecc]
+
+libarchivecc is a wrapper for libarchive.
+
+dependencies:
+ * libarchive [https://www.libarchive.org/]
+
+licensing:
+* libarchivecc itself is released under a 2-clause BSD license. See LICENSE for details.
+* license information for libachive: https://raw.githubusercontent.com/libarchive/libarchive/master/COPYING
+
+runtime exceptions:
+libarchivecc will only throw std::bad_alloc and std::logic_error. Those are
+used for out of memory conditions and programming errors in libarchivecc and
+libarchive.
