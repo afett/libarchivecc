@@ -38,6 +38,16 @@ public:
 	virtual ~Reader();
 };
 
+class ReaderFactory {
+public:
+	using ptr = std::shared_ptr<ReaderFactory>;
+
+	virtual Reader::ptr create_reader() const = 0;
+
+	static ptr create();
+	virtual ~ReaderFactory();
+};
+
 }
 
 #endif

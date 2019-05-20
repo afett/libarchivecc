@@ -42,4 +42,21 @@ Reader::ptr Reader::create()
 
 Reader::~Reader() = default;
 
+class ReaderFactoryImpl : public ReaderFactory {
+public:
+	Reader::ptr create_reader() const override;
+};
+
+Reader::ptr ReaderFactory::create_reader() const
+{
+	return Reader::create();
+}
+
+ReaderFactory::ptr ReaderFactory::create()
+{
+	return std::make_shared<ReaderFactoryImpl>();
+}
+
+ReaderFactory::~ReaderFactory() = default;
+
 }
