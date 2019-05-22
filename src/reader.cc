@@ -7,6 +7,7 @@
 #include <archivecc/reader.h>
 
 #include <archive.h>
+#include <cassert>
 
 namespace archivecc {
 
@@ -49,6 +50,12 @@ public:
 	Error support_format_zip_streamable() override;
 	Error support_format_zip_seekable() override;
 
+	Error set_open_callback(open_callback const&) override;
+	Error set_read_callback(read_callback const&) override;
+	Error set_seek_callback(seek_callback const&) override;
+	Error set_skip_callback(skip_callback const&) override;
+	Error set_close_callback(close_callback const&) override;
+
 private:
 	class Deleter {
 	public:
@@ -63,7 +70,20 @@ private:
 		return ar_.get();
 	}
 
+	static la_ssize_t read_callback_stub(archive *, void *, const void **);
+	static la_int64_t skip_callback_stub(archive *, void *, la_int64_t);
+	static la_int64_t seek_callback_stub(archive *, void *, la_int64_t, int);
+	static la_ssize_t write_callback_stub(archive *, void *, const void *, size_t);
+	static int open_callback_stub(archive *, void *);
+	static int close_callback_stub(archive *, void *);
+
 	std::unique_ptr<archive, Deleter> ar_;
+	read_callback read_cb_;
+	skip_callback skip_cb_;
+	seek_callback seek_cb_;
+	write_callback write_cb_;
+	open_callback open_cb_;
+	close_callback close_cb_;
 };
 
 ReaderImpl::ReaderImpl()
@@ -238,6 +258,90 @@ Error ReaderImpl::support_format_zip_streamable()
 Error ReaderImpl::support_format_zip_seekable()
 {
 	return Error(archive_read_support_format_zip_seekable(raw()));
+}
+
+#define ASSERT_OR_FAIL(expr)                   \
+	assert(expr);                          \
+	if (!(expr)) { return ARCHIVE_FATAL; } \
+
+ssize_t ReaderImpl::read_callback_stub(archive *ar, void *data, const void **buffer)
+{
+	auto self = static_cast<ReaderImpl*>(data);
+	ASSERT_OR_FAIL(ar && self && self->raw() == ar && self->read_cb_);
+	return self->read_cb_(buffer);
+}
+
+int64_t ReaderImpl::skip_callback_stub(archive *ar, void *data, int64_t request)
+{
+	auto self = static_cast<ReaderImpl*>(data);
+	ASSERT_OR_FAIL(ar && self && self->raw() == ar && self->skip_cb_);
+	return self->skip_cb_(request);
+}
+
+int64_t ReaderImpl::seek_callback_stub(archive *ar, void *data, int64_t offset, int whence)
+{
+	auto self = static_cast<ReaderImpl*>(data);
+	ASSERT_OR_FAIL(ar && self && self->raw() == ar && self->seek_cb_);
+	Seek w;
+	switch (whence) {
+	case SEEK_SET: w = Seek::SET; break;
+	case SEEK_CUR: w = Seek::CUR; break;
+	case SEEK_END: w = Seek::END; break;
+	default:
+	       ASSERT_OR_FAIL(false && "bad seek whence value");
+	}
+	return self->seek_cb_(offset, w);
+}
+
+ssize_t ReaderImpl::write_callback_stub(archive *ar, void *data, const void *buffer, size_t length)
+{
+	auto self = static_cast<ReaderImpl*>(data);
+	ASSERT_OR_FAIL(ar && self && self->raw() == ar && self->write_cb_);
+	return self->write_cb_(buffer, length);
+}
+
+int ReaderImpl::open_callback_stub(archive *ar, void *data)
+{
+	auto self = static_cast<ReaderImpl*>(data);
+	ASSERT_OR_FAIL(ar && self && self->raw() == ar && self->open_cb_);
+	return self->open_cb_();
+}
+
+int ReaderImpl::close_callback_stub(archive *ar, void *data)
+{
+	auto self = static_cast<ReaderImpl*>(data);
+	ASSERT_OR_FAIL(ar && self && self->raw() == ar && self->close_cb_);
+	return self->close_cb_();
+}
+
+Error ReaderImpl::set_open_callback(open_callback const& cb)
+{
+	return Error(archive_read_set_open_callback(raw(),
+		cb ? ReaderImpl::open_callback_stub : nullptr));
+}
+
+Error ReaderImpl::set_read_callback(read_callback const& cb)
+{
+	return Error(archive_read_set_read_callback(raw(),
+		cb ? ReaderImpl::read_callback_stub : nullptr));
+}
+
+Error ReaderImpl::set_seek_callback(seek_callback const& cb)
+{
+	return Error(archive_read_set_seek_callback(raw(),
+		cb ? ReaderImpl::seek_callback_stub : nullptr));
+}
+
+Error ReaderImpl::set_skip_callback(skip_callback const& cb)
+{
+	return Error(archive_read_set_skip_callback(raw(),
+		cb ? ReaderImpl::skip_callback_stub : nullptr));
+}
+
+Error ReaderImpl::set_close_callback(close_callback const& cb)
+{
+	return Error(archive_read_set_close_callback(raw(),
+		cb ? ReaderImpl::close_callback_stub : nullptr));
 }
 
 Reader::ptr Reader::create()

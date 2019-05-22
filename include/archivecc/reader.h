@@ -71,6 +71,25 @@ public:
 	virtual Error support_format_zip_streamable() = 0;
 	virtual Error support_format_zip_seekable() = 0;
 
+	enum class Seek {
+		SET,
+		CUR,
+		END,
+	};
+
+	using read_callback = std::function<ssize_t(const void **)>;
+	using skip_callback = std::function<int64_t(int64_t)>;
+	using seek_callback = std::function<int64_t(int64_t, Seek)>;
+	using write_callback = std::function<ssize_t(const void *, size_t)>;
+	using open_callback = std::function<int(void)>;
+	using close_callback = std::function<int(void)>;
+
+	virtual Error set_open_callback(open_callback const&) = 0;
+	virtual Error set_read_callback(read_callback const&) = 0;
+	virtual Error set_seek_callback(seek_callback const&) = 0;
+	virtual Error set_skip_callback(skip_callback const&) = 0;
+	virtual Error set_close_callback(close_callback const&) = 0;
+
 	static ptr create();
 	virtual ~Reader();
 };
