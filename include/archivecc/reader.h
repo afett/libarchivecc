@@ -90,6 +90,11 @@ public:
 	virtual Error set_skip_callback(skip_callback const&) = 0;
 	virtual Error set_close_callback(close_callback const&) = 0;
 
+	virtual Error open() = 0;
+	virtual Error open_filename(const char *, size_t) = 0;
+	virtual Error open_memory(const void *, size_t) = 0;
+	virtual Error open_fd(int, size_t) = 0;
+
 	static ptr create();
 	virtual ~Reader();
 };

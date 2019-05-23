@@ -56,6 +56,11 @@ public:
 	Error set_skip_callback(skip_callback const&) override;
 	Error set_close_callback(close_callback const&) override;
 
+	Error open() override;
+	Error open_filename(const char *, size_t) override;
+	Error open_memory(const void *, size_t) override;
+	Error open_fd(int, size_t) override;
+
 private:
 	class Deleter {
 	public:
@@ -342,6 +347,26 @@ Error ReaderImpl::set_close_callback(close_callback const& cb)
 {
 	return Error(archive_read_set_close_callback(raw(),
 		cb ? ReaderImpl::close_callback_stub : nullptr));
+}
+
+Error ReaderImpl::open()
+{
+	return Error(archive_read_open1(raw()));
+}
+
+Error ReaderImpl::open_filename(const char *filename, size_t block_size)
+{
+	return Error(archive_read_open_filename(raw(), filename, block_size));
+}
+
+Error ReaderImpl::open_memory(const void *buff, size_t size)
+{
+	return Error(archive_read_open_memory(raw(), buff, size));
+}
+
+Error ReaderImpl::open_fd(int fd, size_t block_size)
+{
+	return Error(archive_read_open_fd(raw(), fd, block_size));
 }
 
 Reader::ptr Reader::create()
