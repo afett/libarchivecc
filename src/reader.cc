@@ -58,6 +58,7 @@ public:
 
 	Error open() override;
 	Error open_filename(const char *, size_t) override;
+	Error open_filename(std::string const&, size_t) override;
 	Error open_memory(const void *, size_t) override;
 	Error open_fd(int, size_t) override;
 
@@ -357,6 +358,11 @@ Error ReaderImpl::open()
 Error ReaderImpl::open_filename(const char *filename, size_t block_size)
 {
 	return Error(archive_read_open_filename(raw(), filename, block_size));
+}
+
+Error ReaderImpl::open_filename(std::string const& filename, size_t block_size)
+{
+	return Error(archive_read_open_filename(raw(), filename.c_str(), block_size));
 }
 
 Error ReaderImpl::open_memory(const void *buff, size_t size)
