@@ -62,6 +62,7 @@ public:
 	Error open_memory(const void *, size_t) override;
 	Error open_fd(int, size_t) override;
 
+	Error close() override;
 private:
 	class Deleter {
 	public:
@@ -373,6 +374,11 @@ Error ReaderImpl::open_memory(const void *buff, size_t size)
 Error ReaderImpl::open_fd(int fd, size_t block_size)
 {
 	return Error(archive_read_open_fd(raw(), fd, block_size));
+}
+
+Error ReaderImpl::close()
+{
+	return Error(archive_read_close(raw()));
 }
 
 Reader::ptr Reader::create()

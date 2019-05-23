@@ -96,6 +96,8 @@ public:
 	virtual Error open_memory(const void *, size_t) = 0;
 	virtual Error open_fd(int, size_t) = 0;
 
+	virtual Error close() = 0;
+
 	static ptr create();
 	virtual ~Reader();
 };
