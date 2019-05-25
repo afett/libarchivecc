@@ -15,6 +15,7 @@ class EntryImpl : public Entry {
 public:
 	EntryImpl();
 
+	void clear() noexcept override;
 private:
 	class Deleter {
 	public:
@@ -39,6 +40,11 @@ EntryImpl::EntryImpl()
 	if (entry_ == nullptr) {
 		throw std::bad_alloc();
 	}
+}
+
+void EntryImpl::clear() noexcept
+{
+	archive_entry_clear(raw());
 }
 
 Entry::ptr Entry::create()

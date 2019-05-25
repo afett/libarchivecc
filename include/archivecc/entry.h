@@ -36,6 +36,8 @@ class Entry {
 public:
 	using ptr = std::shared_ptr<Entry>;
 
+	virtual void clear() noexcept = 0;
+
 	static ptr create();
 	virtual ~Entry();
 };
