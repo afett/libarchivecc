@@ -14,8 +14,11 @@ namespace archivecc {
 class EntryImpl : public Entry {
 public:
 	EntryImpl();
+	EntryImpl(archive_entry*);
 
 	void clear() noexcept override;
+	ptr clone() const override;
+
 private:
 	class Deleter {
 	public:
@@ -42,9 +45,23 @@ EntryImpl::EntryImpl()
 	}
 }
 
+EntryImpl::EntryImpl(archive_entry* entry_)
+:
+	entry_(entry_)
+{
+	if (entry_ == nullptr) {
+		throw std::bad_alloc();
+	}
+}
+
 void EntryImpl::clear() noexcept
 {
 	archive_entry_clear(raw());
+}
+
+Entry::ptr EntryImpl::clone() const
+{
+	return std::make_shared<EntryImpl>(archive_entry_clone(raw()));
 }
 
 Entry::ptr Entry::create()

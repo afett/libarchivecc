@@ -37,6 +37,7 @@ public:
 	using ptr = std::shared_ptr<Entry>;
 
 	virtual void clear() noexcept = 0;
+	virtual ptr clone() const = 0;
 
 	static ptr create();
 	virtual ~Entry();
