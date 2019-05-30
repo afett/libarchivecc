@@ -64,14 +64,6 @@ public:
 
 	Error close() override;
 private:
-	class Deleter {
-	public:
-		void operator()(archive *ar) const noexcept
-		{
-			archive_read_free(ar);
-		}
-	};
-
 	inline archive *raw() const
 	{
 		return ar_.get();
@@ -84,7 +76,7 @@ private:
 	static int open_callback_stub(archive *, void *);
 	static int close_callback_stub(archive *, void *);
 
-	std::unique_ptr<archive, Deleter> ar_;
+	std::unique_ptr<archive, decltype(&archive_read_free)> ar_;
 	read_callback read_cb_;
 	skip_callback skip_cb_;
 	seek_callback seek_cb_;
@@ -95,7 +87,7 @@ private:
 
 ReaderImpl::ReaderImpl()
 :
-	ar_(archive_read_new())
+	ar_(archive_read_new(), &archive_read_free)
 {
 	if (ar_ == nullptr) {
 		throw std::bad_alloc();
