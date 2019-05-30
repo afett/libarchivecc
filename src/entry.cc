@@ -20,25 +20,17 @@ public:
 	ptr clone() const override;
 
 private:
-	class Deleter {
-	public:
-		void operator()(archive_entry *ar) const noexcept
-		{
-			archive_entry_free(ar);
-		}
-	};
-
 	inline archive_entry *raw() const
 	{
 		return entry_.get();
 	}
 
-	std::unique_ptr<archive_entry, Deleter> entry_;
+	std::unique_ptr<archive_entry, decltype(&archive_entry_free)> entry_;
 };
 
 EntryImpl::EntryImpl()
 :
-	entry_(archive_entry_new())
+	entry_(archive_entry_new(), &archive_entry_free)
 {
 	if (entry_ == nullptr) {
 		throw std::bad_alloc();
@@ -47,7 +39,7 @@ EntryImpl::EntryImpl()
 
 EntryImpl::EntryImpl(archive_entry* entry_)
 :
-	entry_(entry_)
+	entry_(entry_, &archive_entry_free)
 {
 	if (entry_ == nullptr) {
 		throw std::bad_alloc();
