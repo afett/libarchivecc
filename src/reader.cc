@@ -9,6 +9,8 @@
 #include <archive.h>
 #include <cassert>
 
+#include "entry-impl.h"
+
 namespace archivecc {
 
 class ReaderImpl : public Reader {
@@ -63,6 +65,9 @@ public:
 	Error open_fd(int, size_t) override;
 
 	Error close() override;
+
+	Error next_header(Entry::ptr const&) override;
+
 private:
 	inline archive *raw() const
 	{
@@ -371,6 +376,16 @@ Error ReaderImpl::open_fd(int fd, size_t block_size)
 Error ReaderImpl::close()
 {
 	return Error(archive_read_close(raw()));
+}
+
+Error ReaderImpl::next_header(Entry::ptr const& entry)
+{
+	auto entry_impl = std::dynamic_pointer_cast<EntryImpl>(entry);
+	assert(entry_impl);
+	if (!entry_impl) {
+		return Error(ARCHIVE_FATAL);
+	}
+	return Error(archive_read_next_header2(raw(), entry_impl->raw()));
 }
 
 Reader::ptr Reader::create()

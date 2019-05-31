@@ -28,6 +28,7 @@
 
 #include <memory>
 
+#include <archivecc/entry.h>
 #include <archivecc/error.h>
 
 namespace archivecc {
@@ -97,6 +98,8 @@ public:
 	virtual Error open_fd(int, size_t) = 0;
 
 	virtual Error close() = 0;
+
+	virtual Error next_header(Entry::ptr const&) = 0;
 
 	static ptr create();
 	virtual ~Reader();
