@@ -18,11 +18,11 @@ public:
 	void clear() noexcept override;
 	ptr clone() const override;
 
-private:
 	inline archive_entry *raw() const
 	{
 		return entry_.get();
 	}
+private:
 
 	std::unique_ptr<archive_entry, void(*)(archive_entry*)> entry_;
 };
