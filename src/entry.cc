@@ -13,12 +13,8 @@ namespace archivecc {
 
 EntryImpl::EntryImpl()
 :
-	entry_(archive_entry_new(), &archive_entry_free)
-{
-	if (entry_ == nullptr) {
-		throw std::bad_alloc();
-	}
-}
+	EntryImpl(archive_entry_new())
+{ }
 
 EntryImpl::EntryImpl(archive_entry* entry)
 :
@@ -31,12 +27,8 @@ EntryImpl::EntryImpl(archive_entry* entry)
 
 EntryImpl::EntryImpl(archive* ar)
 :
-	entry_(archive_entry_new2(ar), &archive_entry_free)
-{
-	if (entry_ == nullptr) {
-		throw std::bad_alloc();
-	}
-}
+	EntryImpl(archive_entry_new2(ar))
+{ }
 
 void EntryImpl::clear() noexcept
 {
