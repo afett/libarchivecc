@@ -4,10 +4,10 @@
    license that can be found in the LICENSE file.
 */
 
-#include "entry-impl.h"
-
 #include <archive_entry.h>
 #include <cassert>
+
+#include "entry-impl.h"
 
 namespace archivecc {
 
@@ -20,9 +20,9 @@ EntryImpl::EntryImpl()
 	}
 }
 
-EntryImpl::EntryImpl(archive_entry* entry_)
+EntryImpl::EntryImpl(archive_entry* entry)
 :
-	entry_(entry_, &archive_entry_free)
+	entry_(entry, &archive_entry_free)
 {
 	if (entry_ == nullptr) {
 		throw std::bad_alloc();

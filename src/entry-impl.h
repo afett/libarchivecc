@@ -24,8 +24,8 @@ public:
 	{
 		return entry_.get();
 	}
-private:
 
+private:
 	std::unique_ptr<archive_entry, void(*)(archive_entry*)> entry_;
 };
 
