@@ -4,29 +4,12 @@
    license that can be found in the LICENSE file.
 */
 
-#include <archivecc/entry.h>
+#include "entry-impl.h"
 
 #include <archive_entry.h>
 #include <cassert>
 
 namespace archivecc {
-
-class EntryImpl : public Entry {
-public:
-	EntryImpl();
-	explicit EntryImpl(archive_entry*);
-
-	void clear() noexcept override;
-	ptr clone() const override;
-
-private:
-	inline archive_entry *raw() const
-	{
-		return entry_.get();
-	}
-
-	std::unique_ptr<archive_entry, decltype(&archive_entry_free)> entry_;
-};
 
 EntryImpl::EntryImpl()
 :
