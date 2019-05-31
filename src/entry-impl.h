@@ -6,6 +6,7 @@
 
 #include <archivecc/entry.h>
 
+struct archive;
 struct archive_entry;
 
 namespace archivecc {
@@ -14,6 +15,7 @@ class EntryImpl : public Entry {
 public:
 	EntryImpl();
 	explicit EntryImpl(archive_entry*);
+	explicit EntryImpl(archive*);
 
 	void clear() noexcept override;
 	ptr clone() const override;

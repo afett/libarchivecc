@@ -29,6 +29,15 @@ EntryImpl::EntryImpl(archive_entry* entry_)
 	}
 }
 
+EntryImpl::EntryImpl(archive* ar)
+:
+	entry_(archive_entry_new2(ar), &archive_entry_free)
+{
+	if (entry_ == nullptr) {
+		throw std::bad_alloc();
+	}
+}
+
 void EntryImpl::clear() noexcept
 {
 	archive_entry_clear(raw());

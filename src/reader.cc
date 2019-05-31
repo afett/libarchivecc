@@ -7,7 +7,6 @@
 #include <archivecc/reader.h>
 
 #include <archive.h>
-#include <archive_entry.h>
 #include <cassert>
 
 #include "entry-impl.h"
@@ -382,7 +381,7 @@ Error ReaderImpl::close()
 
 Entry::ptr ReaderImpl::create_entry()
 {
-	return std::make_shared<EntryImpl>(archive_entry_new2(raw()));
+	return std::make_shared<EntryImpl>(raw());
 }
 
 Error ReaderImpl::next_header(Entry::ptr const& entry)
