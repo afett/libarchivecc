@@ -7,6 +7,7 @@
 #include <archivecc/reader.h>
 
 #include <archive.h>
+#include <archive_entry.h>
 #include <cassert>
 
 #include "entry-impl.h"
@@ -65,6 +66,7 @@ public:
 	Error open_fd(int, size_t) override;
 
 	Error close() override;
+	Entry::ptr create_entry() override;
 
 	Error next_header(Entry::ptr const&) override;
 
@@ -376,6 +378,11 @@ Error ReaderImpl::open_fd(int fd, size_t block_size)
 Error ReaderImpl::close()
 {
 	return Error(archive_read_close(raw()));
+}
+
+Entry::ptr ReaderImpl::create_entry()
+{
+	return std::make_shared<EntryImpl>(archive_entry_new2(raw()));
 }
 
 Error ReaderImpl::next_header(Entry::ptr const& entry)

@@ -99,6 +99,7 @@ public:
 
 	virtual Error close() = 0;
 
+	virtual Entry::ptr create_entry() = 0;
 	virtual Error next_header(Entry::ptr const&) = 0;
 
 	static ptr create();
