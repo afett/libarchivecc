@@ -14,7 +14,7 @@ namespace archivecc {
 class EntryImpl : public Entry {
 public:
 	EntryImpl();
-	EntryImpl(archive_entry*);
+	explicit EntryImpl(archive_entry*);
 
 	void clear() noexcept override;
 	ptr clone() const override;
